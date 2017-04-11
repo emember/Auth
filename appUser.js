@@ -1,17 +1,28 @@
-function execute(action, para){
+function execute(action, para, callback){
 	switch(action){
-		case constants.CREATE:
-			create(para);
-			break;
 		case constants.VALIDATE:
-			validate(para);
+			validate(para, callback);
+			break;
+		case constants.CREATE:
+			create(para, callback);
 			break;
 		case constants.ACTIVATE:
-			activate(para);
+			activate(para, callback);
 			break;
 	}
 }
 
+function validate(para, callback){
+	var query ="match (c:company {companyId:{companyId}})\
+	match (c) -[r:hasAppUser]->(u:appUser {appId:{appId}, appKey:{appKey}}) \
+	return count(u)>0";
+
+	console.log(para);
+
+    db.cypherQuery(query, para, function (err, result){
+    	callback(err, err?{}:result.data[0]);
+    });
+}
 
 
 function create(para){
@@ -23,17 +34,6 @@ function create(para){
 
 	dataQFitting.publish(constants.DATABASE, JSON.stringify({ticket:para.token+para.action, query:query, para:para}));		
 
-}
-
-function validate(para){
-	para.companyId=constants.COMPANY_ID;
-
-	var query ="match (c:company {companyId:{companyId}})\
-	match (c) -[r:hasAppUser]->(u:appUser {appId:{appId}, appKey:{appKey}}) \
-	set u.token={token} \
-	return count(u)>0";
-
-	dataQFitting.publish(constants.DATABASE, JSON.stringify({ticket:para.token+para.action, query:query, para:para}));			
 }
 
 function activate(para){

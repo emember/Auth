@@ -1,9 +1,9 @@
 /** topics **/
-const DEBUG=true;
-const DATABASE ='database/#';
+const constants={
+	DEBUG:true,
 
-/** actions **/
-module.exports={
-	DATABASE:DATABASE,
-	DEBUG:DEBUG
+	DATABASE:'database/#',
+	VALIDATE:'validate'
 }
+
+module.exports=constants

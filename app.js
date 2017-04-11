@@ -7,27 +7,9 @@ global.constants=require('./constants');
 global.config =require('./config');
 global.util=require('./util');
 
-const db=new neo4j(config.neo4jServer, config.neo4jKey); 
+global.db=new neo4j(config.neo4jServer, config.neo4jKey); 
 
-function validateAppUser(para, handleResult){
-    var query ="match (c:company {companyId:{companyId}})\
-    match (c) -[r:hasAppUser]->(u:appUser {appId:{appId}, appKey:{appKey}}) \
-    return count(u)>0";
-
-    var res='123';
-
-    db.cypherQuery(
-        query,
-        para,
-        function (err, result) {
-            if (err) {
-                handleResult(err);
-            }else{
-                handleResult(null, result.data);
-            }
-        }); 
-}
-exports.validateAppUser= validateAppUser;    
+var appUser= require('appUser');
 
 exports.handler = (event, context, callback) => {
 
@@ -39,5 +21,7 @@ exports.handler = (event, context, callback) => {
         },
     });
 
-    validateAppUser(event.body, done);
+    console.log('~~~~lalalal~~~~');
+
+    appUser.execute(constants.VALIDATE, JSON.parse(event.body), done);
 };
